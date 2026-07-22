@@ -23,6 +23,9 @@ print(size)
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption("Snake_game")
 
+# Скорость движения (отрисовки кадров)
+timer = pygame.time.Clock()
+
 
 class SnakeBlock:
     def __init__(self, x, y):
@@ -48,13 +51,32 @@ def draw_block(color, row, column):
 
 snake_block = [SnakeBlock(9, 9)]
 
+# Задание направлений движения
+d_row = 0
+d_col = 1
+
 # Игровой цикл
 while True:
 
-    # Закрытие окна
+    # Обработка нажатия клавиш
     for event in pygame.event.get():
+        # Закрытие окна
         if event.type == pygame.QUIT:
             pygame.quit()
+        # Управление клавишами
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP and d_col != 0:  # Вверх
+                d_row = -1
+                d_col = 0
+            elif event.key == pygame.K_DOWN and d_col != 0:  # Вниз
+                d_row = 1
+                d_col = 0
+            elif event.key == pygame.K_LEFT and d_row != 0:  # Влево
+                d_row = 0
+                d_col = -1
+            elif event.key == pygame.K_RIGHT and d_row != 0:  # Вправо
+                d_row = 0
+                d_col = 1
 
     screen.fill(FRAME_COLOR)
     pygame.draw.rect(screen, HEADER_COLOR, (0, 0, size[0], HEADER_MARGIN))
@@ -71,8 +93,11 @@ while True:
 
     for block in snake_block:
         draw_block(SNAKE_COLOR, block.x, block.y)
+        block.x += d_row
+        block.y += d_col
 
-    pygame.display.flip()
+    pygame.display.flip()  # Перезаливка экрана
+    timer.tick(2)  # Скорость обновления экрана
 
 # # ==========
 # При размере блока в 20 пикселей
