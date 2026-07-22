@@ -2,6 +2,9 @@ import pygame
 import random
 import sys
 
+# Инициализация игры
+pygame.init()
+
 # Некоторые цвета
 FRAME_COLOR = (0, 255, 205)  # Цвет рамки
 HEADER_COLOR = (0, 205, 155)
@@ -28,6 +31,8 @@ pygame.display.set_caption("Snake_game")
 
 # Скорость движения (отрисовки кадров)
 timer = pygame.time.Clock()
+
+courier = pygame.font.SysFont("courier", 36)  # Ссылка на шрифт
 
 
 class SnakeBlock:
@@ -86,6 +91,12 @@ apple = get_random_empty_block()
 d_row = 0
 d_col = 1
 
+# Счетчик очков игры
+total = 0
+
+# Скорость игры
+speed = 1
+
 # Игровой цикл
 while True:
 
@@ -113,6 +124,13 @@ while True:
     screen.fill(FRAME_COLOR)
     pygame.draw.rect(screen, HEADER_COLOR, (0, 0, size[0], HEADER_MARGIN))
 
+    # Создание текстов для отрисовки счета и скорости на табло
+    text_total = courier.render(f"Total: {total}", 0, WHITE)
+    text_speed = courier.render(f"Speed: {speed}", 0, WHITE)
+    # Прикрепление текста к экрану
+    screen.blit(text_total, (SIZE_BLOCK, SIZE_BLOCK))
+    screen.blit(text_speed, (SIZE_BLOCK + 250, SIZE_BLOCK))
+
     # Отрисовка поля
     for row in range(COUNT_BLOCKS):
         for column in range(COUNT_BLOCKS):
@@ -136,7 +154,11 @@ while True:
     for block in snake_blocks:
         draw_block(SNAKE_COLOR, block.x, block.y)
 
+    # Змейка съедает яблоко
     if apple == head:
+        total += 1
+        speed = total // 5 + 1
+        snake_blocks.append(apple)
         apple = get_random_empty_block()
 
     # Обработка отрисовки движения змейки при поворотах
@@ -145,7 +167,7 @@ while True:
     snake_blocks.pop(0)
 
     pygame.display.flip()  # Перезаливка экрана
-    timer.tick(3)  # Скорость обновления экрана
+    timer.tick(2 + speed)  # Скорость обновления экрана
 
 # # ==========
 # При размере блока в 20 пикселей
