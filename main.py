@@ -1,4 +1,5 @@
 import pygame
+import random
 import sys
 
 # Некоторые цвета
@@ -7,6 +8,7 @@ HEADER_COLOR = (0, 205, 155)
 WHITE = (255, 255, 255)
 BLUE = (205, 255, 255)
 SNAKE_COLOR = (0, 105, 0)  # Цвет змейки
+RED = (225, 0, 0)  # APPLE_COLOR
 
 # Некоторые размеры
 SIZE_BLOCK = 20  # Габариты 1 блока/клетки
@@ -35,9 +37,30 @@ class SnakeBlock:
 
     def is_inside(self):
         """
-        Проверка того, чтобы змейка не ушла за пределы игрового поля
+        Проверка того, чтобы змейка не ушла за пределы игрового поля.
         """
-        return 0 <= self.x < SIZE_BLOCK and 0 <= self.y < SIZE_BLOCK
+        return 0 <= self.x < COUNT_BLOCKS and 0 <= self.y < COUNT_BLOCKS
+
+    def __eq__(self, other):
+        """
+        Логика для сравнения двух экземпляров класса.
+        """
+        return isinstance(other, SnakeBlock) and self.x == other.x and self.y == other.y
+
+
+def get_random_empty_block():
+    """
+    Функция перемещения яблока в случайную пустую ячейку.
+    """
+    x = random.randint(0, COUNT_BLOCKS - 1)
+    y = random.randint(0, COUNT_BLOCKS - 1)
+    empty_block = SnakeBlock(x, y)
+    # Генерировать координаты до тех пор,
+    # пока не получатся координаты пустой ячейки
+    while empty_block in snake_blocks:
+        empty_block.x = random.randint(0, COUNT_BLOCKS - 1)
+        empty_block.y = random.randint(0, COUNT_BLOCKS - 1)
+    return empty_block
 
 
 def draw_block(color, row, column):
@@ -57,6 +80,7 @@ def draw_block(color, row, column):
 
 
 snake_blocks = [SnakeBlock(9, 8), SnakeBlock(9, 9), SnakeBlock(9, 10)]
+apple = get_random_empty_block()
 
 # Задание направлений движения
 d_row = 0
@@ -106,18 +130,22 @@ while True:
         pygame.quit()
         sys.exit()
 
+    draw_block(RED, apple.x, apple.y)  # Отрисовка яблока
+
     # Отрисовка змейки на поле
     for block in snake_blocks:
         draw_block(SNAKE_COLOR, block.x, block.y)
 
-    # Обработка отрисовки движения змейки при поворотах
+    if apple == head:
+        apple = get_random_empty_block()
 
+    # Обработка отрисовки движения змейки при поворотах
     new_head = SnakeBlock(head.x + d_row, head.y + d_col)
     snake_blocks.append(new_head)
     snake_blocks.pop(0)
 
     pygame.display.flip()  # Перезаливка экрана
-    timer.tick(2)  # Скорость обновления экрана
+    timer.tick(3)  # Скорость обновления экрана
 
 # # ==========
 # При размере блока в 20 пикселей
