@@ -5,6 +5,7 @@ FRAME_COLOR = (0, 255, 205)  # Цвет рамки
 HEADER_COLOR = (0, 205, 155)
 WHITE = (255, 255, 255)
 BLUE = (205, 255, 255)
+SNAKE_COLOR = (0, 105, 0)  # Цвет змейки
 
 # Некоторые размеры
 SIZE_BLOCK = 20  # Габариты 1 блока/клетки
@@ -13,14 +14,39 @@ MARGIN = 1  # Линия разделения блоков
 HEADER_MARGIN = 100  # Информационное табло
 # Размеры окна
 size = [
-    SIZE_BLOCK * COUNT_BLOCKS + 2 * SIZE_BLOCK + MARGIN * SIZE_BLOCK,
-    SIZE_BLOCK * COUNT_BLOCKS + 2 * SIZE_BLOCK + MARGIN * SIZE_BLOCK + HEADER_MARGIN
+    SIZE_BLOCK * COUNT_BLOCKS + 2 * SIZE_BLOCK + MARGIN * COUNT_BLOCKS,
+    SIZE_BLOCK * COUNT_BLOCKS + 2 * SIZE_BLOCK + MARGIN * COUNT_BLOCKS + HEADER_MARGIN
 ]
 print(size)
 
 # Создание окна
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption("Snake_game")
+
+
+class SnakeBlock:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+
+def draw_block(color, row, column):
+    """
+    Функция отрисовки блока.
+    """
+    pygame.draw.rect(
+        screen,
+        color,
+        (
+            SIZE_BLOCK + column * SIZE_BLOCK + MARGIN * (column + 1),
+            HEADER_MARGIN + SIZE_BLOCK + row * SIZE_BLOCK + MARGIN * (row + 1),
+            SIZE_BLOCK,
+            SIZE_BLOCK
+        )
+    )
+
+
+snake_block = [SnakeBlock(9, 9)]
 
 # Игровой цикл
 while True:
@@ -40,16 +66,11 @@ while True:
                 color = BLUE
             else:
                 color = WHITE
-            pygame.draw.rect(
-                screen,
-                color,
-                (
-                    SIZE_BLOCK + column * SIZE_BLOCK + MARGIN * (column + 1),
-                    HEADER_MARGIN + SIZE_BLOCK + row * SIZE_BLOCK + MARGIN * (row + 1),
-                    SIZE_BLOCK,
-                    SIZE_BLOCK
-                )
-            )
+
+            draw_block(color, row, column)
+
+    for block in snake_block:
+        draw_block(SNAKE_COLOR, block.x, block.y)
 
     pygame.display.flip()
 
