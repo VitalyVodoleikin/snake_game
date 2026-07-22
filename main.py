@@ -88,8 +88,8 @@ snake_blocks = [SnakeBlock(9, 8), SnakeBlock(9, 9), SnakeBlock(9, 10)]
 apple = get_random_empty_block()
 
 # Задание направлений движения
-d_row = 0
-d_col = 1
+d_row = buf_row = 0
+d_col = buf_col = 1
 
 # Счетчик очков игры
 total = 0
@@ -109,17 +109,17 @@ while True:
         # Управление клавишами
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP and d_col != 0:  # Вверх
-                d_row = -1
-                d_col = 0
+                buf_row = -1
+                buf_col = 0
             elif event.key == pygame.K_DOWN and d_col != 0:  # Вниз
-                d_row = 1
-                d_col = 0
+                buf_row = 1
+                buf_col = 0
             elif event.key == pygame.K_LEFT and d_row != 0:  # Влево
-                d_row = 0
-                d_col = -1
+                buf_row = 0
+                buf_col = -1
             elif event.key == pygame.K_RIGHT and d_row != 0:  # Вправо
-                d_row = 0
-                d_col = 1
+                buf_row = 0
+                buf_col = 1
 
     screen.fill(FRAME_COLOR)
     pygame.draw.rect(screen, HEADER_COLOR, (0, 0, size[0], HEADER_MARGIN))
@@ -154,6 +154,8 @@ while True:
     for block in snake_blocks:
         draw_block(SNAKE_COLOR, block.x, block.y)
 
+    pygame.display.flip()  # Перезаливка экрана
+
     # Змейка съедает яблоко
     if apple == head:
         total += 1
@@ -162,11 +164,18 @@ while True:
         apple = get_random_empty_block()
 
     # Обработка отрисовки движения змейки при поворотах
+    d_row = buf_row
+    d_col = buf_col
     new_head = SnakeBlock(head.x + d_row, head.y + d_col)
+
+    if new_head in snake_blocks:
+        print("Crash yourself")
+        pygame.quit()
+        sys.exit()
+
     snake_blocks.append(new_head)
     snake_blocks.pop(0)
 
-    pygame.display.flip()  # Перезаливка экрана
     timer.tick(2 + speed)  # Скорость обновления экрана
 
 # # ==========
