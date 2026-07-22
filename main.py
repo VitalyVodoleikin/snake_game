@@ -1,4 +1,5 @@
 import pygame
+import sys
 
 # Некоторые цвета
 FRAME_COLOR = (0, 255, 205)  # Цвет рамки
@@ -32,6 +33,12 @@ class SnakeBlock:
         self.x = x
         self.y = y
 
+    def is_inside(self):
+        """
+        Проверка того, чтобы змейка не ушла за пределы игрового поля
+        """
+        return 0 <= self.x < SIZE_BLOCK and 0 <= self.y < SIZE_BLOCK
+
 
 def draw_block(color, row, column):
     """
@@ -49,7 +56,7 @@ def draw_block(color, row, column):
     )
 
 
-snake_block = [SnakeBlock(9, 9)]
+snake_blocks = [SnakeBlock(9, 8), SnakeBlock(9, 9), SnakeBlock(9, 10)]
 
 # Задание направлений движения
 d_row = 0
@@ -63,6 +70,7 @@ while True:
         # Закрытие окна
         if event.type == pygame.QUIT:
             pygame.quit()
+            sys.exit()
         # Управление клавишами
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP and d_col != 0:  # Вверх
@@ -91,10 +99,22 @@ while True:
 
             draw_block(color, row, column)
 
-    for block in snake_block:
+    # Проверка столкновения головы змейки с краем поля
+    head = snake_blocks[-1]
+    if not head.is_inside():
+        print("Crash")
+        pygame.quit()
+        sys.exit()
+
+    # Отрисовка змейки на поле
+    for block in snake_blocks:
         draw_block(SNAKE_COLOR, block.x, block.y)
-        block.x += d_row
-        block.y += d_col
+
+    # Обработка отрисовки движения змейки при поворотах
+
+    new_head = SnakeBlock(head.x + d_row, head.y + d_col)
+    snake_blocks.append(new_head)
+    snake_blocks.pop(0)
 
     pygame.display.flip()  # Перезаливка экрана
     timer.tick(2)  # Скорость обновления экрана
